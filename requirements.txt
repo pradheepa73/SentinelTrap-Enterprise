@@ -1,0 +1,4 @@
+﻿paramiko
+pandas
+jinja2
+requests

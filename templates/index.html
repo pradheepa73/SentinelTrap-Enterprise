@@ -1,0 +1,70 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SentinelTrap Enterprise</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #0d1117; color: #c9d1d9; padding: 20px; }
+        .navbar { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; padding-bottom: 10px; }
+        h1 { color: #58a6ff; margin: 0; }
+        .logout { background: #da3633; color: white; padding: 8px 15px; text-decoration: none; border-radius: 4px; font-weight: bold; }
+        .grid { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 30px; }
+        .card { background: #161b22; border: 1px solid #30363d; padding: 20px; border-radius: 8px; width: 350px; }
+        h2 { color: #f85149; border-bottom: 1px solid #30363d; padding-bottom: 10px; font-size: 18px; }
+        input, textarea { width: 95%; padding: 8px; margin: 10px 0; background: #0d1117; border: 1px solid #30363d; color: #3fb950; border-radius: 4px; }
+        button { width: 100%; padding: 10px; background: #238636; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .output { background: #000; color: #58a6ff; padding: 10px; height: 150px; overflow-y: auto; font-size: 12px; margin-top: 10px; border: 1px solid #30363d; }
+        iframe { width: 100%; height: 300px; border: 1px solid #30363d; background: white; }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>🛡️ SentinelTrap Enterprise</h1>
+        <a href="/logout" class="logout">Logout</a>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h2>Web Vulnerability Scanner</h2>
+            <input type="text" id="web-url" value="http://zero.webappsecurity.com/">
+            <button onclick="scanWeb()">Run XSS Scan</button>
+            <div class="output" id="web-out">Ready...</div>
+        </div>
+
+        <div class="card">
+            <h2>Network Port Scanner</h2>
+            <input type="text" id="net-target" value="google.com">
+            <button onclick="scanNet()">Run Nmap Scan</button>
+            <div class="output" id="net-out">Ready...</div>
+        </div>
+
+        <div class="card">
+            <h2>Intrusion Log Analyzer</h2>
+            <textarea id="log-data" rows="3">192.168.1.5 - - - 401
+192.168.1.5 - - - 401
+192.168.1.5 - - - 401</textarea>
+            <button onclick="scanLogs()">Analyze Logs</button>
+            <div class="output" id="log-out">Ready...</div>
+        </div>
+
+        <div class="card" style="width: 100%;">
+            <h2>Live Honeypot Attack Dashboard</h2>
+            <button onclick="loadHoneypot()">Refresh Honeypot Data</button>
+            <iframe id="honey-frame" src="/api/honeypot"></iframe>
+        </div>
+    </div>
+
+    <script>
+        async function postData(url, data, outId) {
+            document.getElementById(outId).innerText = "Scanning...";
+            const res = await fetch(url, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)});
+            const json = await res.json();
+            document.getElementById(outId).innerText = json.result.join('\n');
+        }
+        function scanWeb() { postData('/api/scan/web', {url: document.getElementById('web-url').value}, 'web-out'); }
+        function scanNet() { postData('/api/scan/network', {target: document.getElementById('net-target').value}, 'net-out'); }
+        function scanLogs() { postData('/api/scan/logs', {logs: document.getElementById('log-data').value}, 'log-out'); }
+        function loadHoneypot() { document.getElementById('honey-frame').src = '/api/honeypot?t=' + new Date().getTime(); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{"honeypot": {"bind_ip": "0.0.0.0", "port": 2222, "hostname": "prod-db-server-01", "banner": "SSH-2.0-OpenSSH_8.2p1"}, "database": {"name": "evidence/attacks.db"}}
